@@ -1,0 +1,16 @@
+POST  http://localhost:8080/signup
+content-Type: application/json
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNzc0BnbWFpbC5jb20iLCJleHAiOjE3ODg1MTUzMjYsImlkIjowfQ.LQQoAVea0I5AssmveJeGcNk_gS4lOGtyE3bQCQgUbCg
+
+{  
+	"firstName" :"said",
+	"secondName" :"Fatah",
+	"userName" :"ssaid123",
+	"email" :"sss@gmail.com",
+	"password" :"12345678"
+}
+
+
+
+
+  
