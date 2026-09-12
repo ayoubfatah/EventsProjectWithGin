@@ -36,14 +36,18 @@ if err != nil {
 }
 
  createEventsTable := `
- CREATE TABLE IF NOT EXISTS events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  description TEXT NOT NULL,
-  location TEXT NOT NULL, 
-  dateTime DATETIME NOT NULL,
-  userId  INTEGER  REFERENCES users(id)
- )
+    CREATE TABLE IF NOT EXISTS events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    city TEXT NOT NULL,
+    location TEXT NOT NULL,
+    date DATETIME NOT NULL,
+    organizerName TEXT NOT NULL,
+    imageUrl TEXT NOT NULL,
+    description TEXT NOT NULL,
+    userId INTEGER REFERENCES users(id)
+    )
  `	
 
 _ , err = DB.Exec(createEventsTable)
@@ -51,13 +55,13 @@ if err != nil {
     panic(err)
 }
  createRegisterTable := `
- CREATE TABLE IF NOT EXISTS registrations (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  eventId INTEGER,
-  userId INTEGER
-  FOREIGNER KEY(eventId) REFERENCES events(id)
-  FOREIGNER KEY(userId) REFERENCES users(id)
- )
+    CREATE TABLE IF NOT EXISTS registrations (
+    eventId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    PRIMARY KEY (eventId, userId),
+    FOREIGN KEY (eventId) REFERENCES events(id),
+    FOREIGN KEY (userId) REFERENCES users(id)
+    )
  `	
 
 _ , err = DB.Exec(createRegisterTable)

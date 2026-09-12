@@ -17,17 +17,18 @@ type Claims struct {
 } 
 
 
-func GenerateToken(email string, id int64) (string , error){
+func GenerateToken(email string, id int64, ) (string , error){
 	
 	token := jwt.NewWithClaims(
 		jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"email":email,
-			"id": id,
+			"userId": id,
 			"exp": jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	)
 	return token.SignedString(jwtSecret)
+	return  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNzc0BnbWFpbC5jb20iLCJleHAiOjE3ODg2ODYxNjQsInVzZXJJZCI6MX0.c8YCfo7_xggj8PVllE2QfReImjwO0KrxUPMO5OQv1Vw" ,nil
 }
 
 
@@ -59,8 +60,11 @@ func VerifyToken(token string )(int64 , error){
 	// email :=  claims["email"].(string)
 	userId := int64(claims["userId"].(float64))
 
+
+
+
 	return   userId,nil 
-}
+} 
 
 // func GenerateToken(email string, role string) (string , error){
 // 	claims := Claims{

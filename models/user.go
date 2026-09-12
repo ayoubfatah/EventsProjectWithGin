@@ -2,17 +2,18 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"gin-quickstart/db"
 	"gin-quickstart/utils"
 )
 
 type User struct {
 	Id int64
-	FirstName string `binding:"required"` 
-	SecondName string `binding:"required"` 
-	UserName string `binding:"required"` 
-	Email    string `binding:"required"` 
-	Password string `binding:"required"`  
+	FirstName string `json:"firstName" binding:"required"` 
+	SecondName string `json:"secondName" binding:"required"` 
+	UserName string `json:"userName" binding:"required"` 
+	Email    string `json:"email" binding:"required"` 
+	Password string `json:"password" binding:"required"`  
 }
 
 
@@ -103,4 +104,36 @@ func (u *SignupRequest) ValidateCredentials() error{
 		return  errors.New("credentials invalid")
 	}
 	return nil 
+}
+
+
+func GetUserByID(userId int64) (User, error) {
+
+
+    const query = `
+        SELECT id, email, firstName, secondName, userName
+        FROM users
+        WHERE id = ?
+    `
+
+    row := db.DB.QueryRow(query, userId)
+
+    var user User
+
+    err := row.Scan(
+        &user.Id,
+        &user.Email,
+        &user.FirstName,
+        &user.SecondName,
+        &user.UserName,
+    )
+
+    if err != nil {
+
+        return User{}, err
+    }
+
+
+
+    return user, nil
 }

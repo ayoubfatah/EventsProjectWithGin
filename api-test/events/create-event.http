@@ -1,14 +1,16 @@
 POST  http://localhost:8080/events
 content-Type: application/json
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNzc0BnbWFpbC5jb20iLCJleHAiOjE3ODg1MTUzMjYsImlkIjowfQ.LQQoAVea0I5AssmveJeGcNk_gS4lOGtyE3bQCQgUbCg
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNzc0BnbWFpbC5jb20iLCJleHAiOjE3ODg2ODYxNjQsInVzZXJJZCI6MX0.c8YCfo7_xggj8PVllE2QfReImjwO0KrxUPMO5OQv1VweyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNzc0BnbWFpbC5jb20iLCJleHAiOjE3ODg2ODYxNjQsInVzZXJJZCI6MX0.c8YCfo7_xggj8PVllE2QfReImjwO0KrxUPMO5OQv1Vw
 
-
-{  
-	"name" :"name of the event2 1" ,
-	"description" :"description of the event1",
-	"location" :"location2",
-	"dateTime" :"2025-01-01T15:30:00.000Z"
+{
+  "name": "Tech Conference",
+  "slug": "tech-conference",
+  "city": "Marrakesh",
+  "location": "Conference Center",
+  "date": "2030-11-15T00:00:00.000Z",
+  "organizerName": "John Doe",
+  "imageUrl":       "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+  "description": "A technology conference in Marrakesh.",
+  "userId": 1
 }
 
-
-  

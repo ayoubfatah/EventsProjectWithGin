@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"gin-quickstart/utils"
 	"net/http"
 
@@ -10,7 +9,7 @@ import (
 
 func Authenticated(c *gin.Context){
 	token := c.Request.Header.Get("Authorization")
-		fmt.Printf("value n token %v",token)
+
 		if token == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"error": "authorization header required",

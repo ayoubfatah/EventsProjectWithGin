@@ -17,7 +17,7 @@ func getEvents(c *gin.Context){
 	  
 	if(err !=nil){
 		c.JSON(http.StatusInternalServerError , gin.H{
-			"message": "an error happened while trying to get events",
+			"message": err.Error(),
 		
 		})
 		return
@@ -48,17 +48,51 @@ func getEvent(c *gin.Context){
 
 }
 
-func createEvents( c *gin.Context){
+func getEventsByCity(c *gin.Context){
+	city := c.Param("city")
 
 	
+	events , err := models.GetEventsByCity(city)
+	if(err!= nil){
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"events": events,
+	})
+}
 
-		
-	var event models.Event
+
+func getEventBySlug(c *gin.Context){
+	slug   :=  c.Param("slug")
+
+	event , err := models.GetEventBySlug(slug)
+		if(err !=nil){
+		c.JSON(http.StatusInternalServerError , gin.H{
+			"message": err.Error(),		
+		})
+		return
+	}
+	  c.JSON(http.StatusOK, gin.H{ 
+      "event": event,
+    }) 
+
+}
+
+func createEvents( c *gin.Context){
+	
+  var event models.Event
+
    if err  :=	c.ShouldBindJSON(&event); err !=nil{
+
 	 c.JSON(http.StatusBadRequest, gin.H{
-            "error": err.Error(),
+            "error": "something happend while trying to bind the json",
         })
-        return
+
+
+	return
    }
 
   userId := c.GetInt64("userId")
@@ -87,22 +121,22 @@ func updateEvent(c *gin.Context){
 		})
 		return
 	}
-	userId := c.GetInt64("userId")
-	event , err := models.GetEventById(id)
+	// userId := c.GetInt64("userId")
+	// event , err := models.GetEventById(id)
 
 
 	
 	
 	
 	if err !=nil{
-		c.JSON(http.StatusInternalServerError , gin.H{"message": "Couldn't fetch the event ",})
+		c.JSON(http.StatusInternalServerError , gin.H{"message": err.Error()})
 	return}	
 		
 		
-		if event.UserId != userId {
-			c.JSON(http.StatusUnauthorized , gin.H{"message": "this event doesnt belong to you ",})
-			return
-		}	
+		// if event.UserId != userId {
+		// 	c.JSON(http.StatusUnauthorized , gin.H{"message": "this event doesnt belong to you ",})
+		// 	return
+		// }	
 		
 		
 	var updatedEvent models.Event
@@ -126,6 +160,7 @@ func updateEvent(c *gin.Context){
   
   	c.JSON(http.StatusOK, gin.H{
 	"message":"Event Updated successfully",
+	"event":updatedEvent,
   	})	
 	
 }
@@ -233,3 +268,22 @@ func cancelRegistration(c *gin.Context){
 	})
 
 }
+
+
+
+
+func getCurrentUserEvents(c *gin.Context){
+	userId := c.GetInt64("userId")
+
+	events , err :=	models.GetEventsByUserID(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Couldn't fetch the user's events",
+		})
+		return
+	}
+c.JSON(http.StatusOK , gin.H{
+	"events" :events,
+})
+
+}	

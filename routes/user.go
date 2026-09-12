@@ -87,6 +87,32 @@ func login(c *gin.Context){
 
 	c.JSON(200, gin.H{
 		"token": token,
+		"user":user,
 	})
    
+}
+
+
+
+
+func getCurrentUser(c *gin.Context){
+
+    userId := c.GetInt64("userId")
+
+
+
+    user, err := models.GetUserByID(userId)
+
+	
+
+
+    if err != nil {
+        c.JSON(404, gin.H{
+            "error": "User not found",
+        })
+        return
+    }
+
+    c.JSON(200, user)
+
 }
