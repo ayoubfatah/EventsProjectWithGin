@@ -19,7 +19,6 @@ err :=c.ShouldBindJSON(&user)
         })
         return
 }
- 	user.Id = 1
  	err =  user.Save()
  	if(err !=nil){
 		c.JSON(http.StatusInternalServerError , gin.H{

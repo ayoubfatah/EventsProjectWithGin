@@ -121,8 +121,8 @@ func updateEvent(c *gin.Context){
 		})
 		return
 	}
-	// userId := c.GetInt64("userId")
-	// event , err := models.GetEventById(id)
+	userId := c.GetInt64("userId")
+	event , err := models.GetEventById(id)
 
 
 	
@@ -133,10 +133,10 @@ func updateEvent(c *gin.Context){
 	return}	
 		
 		
-		// if event.UserId != userId {
-		// 	c.JSON(http.StatusUnauthorized , gin.H{"message": "this event doesnt belong to you ",})
-		// 	return
-		// }	
+		if event.UserId != userId {
+			c.JSON(http.StatusUnauthorized , gin.H{"message": "this event doesnt belong to you ",})
+			return
+		}	
 		
 		
 	var updatedEvent models.Event
@@ -274,7 +274,6 @@ func cancelRegistration(c *gin.Context){
 
 func getCurrentUserEvents(c *gin.Context){
 	userId := c.GetInt64("userId")
-
 	events , err :=	models.GetEventsByUserID(userId)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -282,6 +281,8 @@ func getCurrentUserEvents(c *gin.Context){
 		})
 		return
 	}
+
+
 c.JSON(http.StatusOK , gin.H{
 	"events" :events,
 })

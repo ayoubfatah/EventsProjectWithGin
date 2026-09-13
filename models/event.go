@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"gin-quickstart/db"
 	"time"
 )
@@ -343,6 +344,8 @@ func (e *Event) CancelRegistration(userId int64) error {
 //  seeds
 
 func GetEventsByUserID(userID int64) ([]Event , error){
+	fmt.Println(userID)
+
 query := `
     SELECT
         id,
@@ -381,6 +384,7 @@ query := `
 			&event.Description,
 			&event.UserId,
 		)
+		
 		if err != nil {
 			return nil, err
 		}

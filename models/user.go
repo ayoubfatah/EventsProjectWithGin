@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"fmt"
 	"gin-quickstart/db"
 	"gin-quickstart/utils"
 )
