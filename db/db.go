@@ -10,7 +10,7 @@ var DB  *sql.DB
 
 func InitDB(){
 var err error
-DB, err := sql.Open("sqlite", "file:events.db?cache=shared&mode=memory")
+DB, err = sql.Open("sqlite", "file:events.db?cache=shared&mode=memory")
  if(err !=nil ){
 	panic("Couldn't connect to database")
  }
