@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"fmt"
 	"gin-quickstart/models"
 	"net/http"
 	"strconv"
@@ -10,21 +11,70 @@ import (
 
 
 
+func getEvents(c *gin.Context) {
 
-func getEvents(c *gin.Context){
+	page := 1
+	limit := 4
 
-	events , err :=	models.GetAllEvents()
-	  
-	if(err !=nil){
-		c.JSON(http.StatusInternalServerError , gin.H{
-			"message": err.Error(),
-		
+	// -----------------------------
+	// Get page
+	// -----------------------------
+
+	if pageQuery := c.Query("page"); pageQuery != "" {
+
+		parsedPage, err := strconv.Atoi(pageQuery)
+
+		if err != nil || parsedPage < 1 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "page must be a positive integer",
+			})
+			return
+		}
+
+		page = parsedPage
+	}
+
+	// -----------------------------
+	// Get limit
+	// -----------------------------
+
+	if limitQuery := c.Query("limit"); limitQuery != "" {
+
+		parsedLimit, err := strconv.Atoi(limitQuery)
+
+		if err != nil || parsedLimit < 1 {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"message": "limit must be a positive integer",
+			})
+			return
+		}
+
+		limit = parsedLimit
+	}
+
+	// Prevent clients from requesting huge pages.
+	if limit > 50 {
+		limit = 50
+	}
+
+	// -----------------------------
+	// Fetch events
+	// -----------------------------
+
+	result, err := models.GetAllEvents(page, limit)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Couldn't fetch events",
 		})
 		return
 	}
-	  c.JSON(http.StatusOK, gin.H{ 
-      "events": events,
-    }) 
+
+	// -----------------------------
+	// Response
+	// -----------------------------
+
+	c.JSON(http.StatusOK, result)
 }
 
 func getEvent(c *gin.Context){
@@ -111,8 +161,24 @@ func createEvents( c *gin.Context){
 	"event": event,
   })
 
-} 
+}
 
+
+func GetCurrentUserRegisteredEvents(c *gin.Context){
+	userId := int64(1)
+	registeredEvents , err :=  models.GetRegisteredEventsByUser(userId)
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError,
+			 gin.H {"message":""})
+	return
+	}
+	c.JSON(http.StatusOK , gin.H{
+		"events": registeredEvents,
+	})
+
+}
+ 
 func updateEvent(c *gin.Context){
 	id , err :=  strconv.ParseInt(c.Param("id"),10 , 64)
 	if(err !=nil){
@@ -208,6 +274,8 @@ func registerEvent(c *gin.Context){
 
 	userId := c.GetInt64("userId")
 	eventId , err := strconv.ParseInt(c.Param("id"),10 ,64)
+	fmt.Println("event iD")
+	fmt.Println(eventId)
 	if err != nil{
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "id must be an int",
@@ -288,3 +356,37 @@ c.JSON(http.StatusOK , gin.H{
 })
 
 }	
+
+
+func getEventReservation(c *gin.Context) {
+	fmt.Println("firing")
+	userId := c.GetInt64("userId")
+
+	eventId, err := strconv.ParseInt(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "id must be an int",
+		})
+		return
+	}
+
+	event, err := models.GetEventById(eventId)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "Event not found",
+		})
+		return
+	}
+
+	reserved, err := event.IsRegistered(userId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Couldn't check event reservation",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"reserved": reserved,
+	})
+}

@@ -21,6 +21,13 @@ type Event struct {
     UserId        int64     `json:"userId"`
 }
 
+type PaginatedEvents struct {
+	Events  []Event `json:"events"`
+	Page    int     `json:"page"`
+	Limit   int     `json:"limit"`
+	HasMore bool    `json:"hasMore"`
+}
+
 var events = []Event{}
 
 func (e *Event) Save() error {
@@ -71,18 +78,47 @@ func (e *Event) Save() error {
 	return nil
 }
 
-func GetAllEvents() ([]Event, error) {
-	query := `SELECT * FROM events`
+func GetAllEvents(page int, limit int) (PaginatedEvents, error) {
+	offset := (page - 1) * limit
 
-	rows, err := db.DB.Query(query)
+	// We request one extra event.
+	//
+	// Example:
+	// limit = 10
+	// database returns up to 11
+	//
+	// If we get 11:
+	//     there is another page.
+	//
+	// If we get 10 or less:
+	//     there is no next page.
+	query := `
+		SELECT
+			id,
+			name,
+			slug,
+			city,
+			location,
+			date,
+			organizerName,
+			imageUrl,
+			description,
+			userId
+		FROM events
+		ORDER BY id DESC
+		LIMIT ? OFFSET ?
+	`
+
+	rows, err := db.DB.Query(query, limit+1, offset)
 	if err != nil {
-		return nil, err
+		return PaginatedEvents{}, err
 	}
 	defer rows.Close()
 
-	var events []Event
+	events := make([]Event, 0, limit+1)
 
 	for rows.Next() {
+
 		var event Event
 
 		err := rows.Scan(
@@ -99,13 +135,29 @@ func GetAllEvents() ([]Event, error) {
 		)
 
 		if err != nil {
-			return nil, err
+			return PaginatedEvents{}, err
 		}
 
 		events = append(events, event)
 	}
 
-	return events, nil
+	if err := rows.Err(); err != nil {
+		return PaginatedEvents{}, err
+	}
+
+	hasMore := len(events) > limit
+
+	// We don't send the extra event to the frontend.
+	if hasMore {
+		events = events[:limit]
+	}
+
+	return PaginatedEvents{
+		Events:  events,
+		Page:    page,
+		Limit:   limit,
+		HasMore: hasMore,
+	}, nil
 }
 
 func GetEventById(id int64) (*Event, error) {
@@ -180,6 +232,7 @@ func GetEventsByCity(city string) ([]Event, error) {
 
 	return events, nil
 }
+
 
 
 
@@ -341,10 +394,31 @@ func (e *Event) CancelRegistration(userId int64) error {
 }
 
 
-//  seeds
+
+func (e *Event) IsRegistered(userId int64) (bool, error) {
+	query := `
+		SELECT EXISTS(
+			SELECT 1
+			FROM registrations
+			WHERE userId = ? AND eventId = ?
+		)
+	`
+
+	var registered bool
+
+	err := db.DB.QueryRow(query, userId, e.Id).Scan(&registered)
+	if err != nil {
+		return false, err
+	}
+	fmt.Println("waaaa")
+	fmt.Println(registered)
+	return registered, nil
+}
+
+
 
 func GetEventsByUserID(userID int64) ([]Event , error){
-	fmt.Println(userID)
+
 
 query := `
     SELECT
@@ -650,3 +724,51 @@ query := `
 
 // 	return nil
 // }
+
+func GetRegisteredEventsByUser(userId int64) ([]Event, error) {
+	query := `
+		SELECT e.id, e.name, e.slug, e.city, e.location,
+		       e.date, e.organizerName, e.imageUrl,
+		       e.description, e.userId
+		FROM events e
+		INNER JOIN registrations r ON e.id = r.eventId
+		WHERE r.userId = ?
+	`
+
+	rows, err := db.DB.Query(query, userId)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var events []Event
+
+	for rows.Next() {
+		var event Event
+
+		err := rows.Scan(
+			&event.Id,
+			&event.Name,
+			&event.Slug,
+			&event.City,
+			&event.Location,
+			&event.Date,
+			&event.OrganizerName,
+			&event.ImageUrl,
+			&event.Description,
+			&event.UserId,
+		)
+
+		if err != nil {
+			return nil, err
+		}
+
+		events = append(events, event)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
