@@ -14,12 +14,19 @@ func main(){
 	db.InitDB()
 	server :=	gin.Default()
 
-	server.Use(cors.New(cors.Config{
-    AllowOrigins:     []string{"http://localhost:3000","https://eventify-fawn.vercel.app"},
-    AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
-    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-    AllowCredentials: true,
-}))
+	config := cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://eventify-fawn.vercel.app"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}
+
+	server.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "Backend is running!"})
+	})
+
+	server.Use(cors.New(config))
 	// models.SeedEvents()
 	
 
