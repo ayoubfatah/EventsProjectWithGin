@@ -3,6 +3,7 @@ package main
 import (
 	"gin-quickstart/db"
 	"gin-quickstart/routes"
+	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,10 @@ func main(){
 
 
 	routes.RegisterRoutes(server)
-	server.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+    port = "8080"
+}
+	server.Run(":" + port)
 }
 
