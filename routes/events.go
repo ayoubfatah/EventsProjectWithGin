@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gin-quickstart/models"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -153,9 +154,38 @@ func createEvents( c *gin.Context){
   })
 
 }
+func seedEvents(c *gin.Context) {
+	code := c.Param("code")
 
+	expectedCode := os.Getenv("SEED_CODE")
 
+	if expectedCode == "" {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Seed code is not configured",
+		})
+		return
+	}
 
+	if code != expectedCode {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": "Invalid seed code",
+		})
+		return
+	}
+
+	err := models.SeedEvents()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Events created successfully",
+	})
+}
 
 
 

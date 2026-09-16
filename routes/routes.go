@@ -18,7 +18,8 @@ func RegisterRoutes(server *gin.Engine){
 	authenticated.GET("/events/registration", GetCurrentUserRegisteredEvents)
 
 
-
+	server.GET("/events/seed/:code", seedEvents)
+	// 
 	authenticated.GET("/events/me", getCurrentUserEvents)
 	authenticated.POST("/events", createEvents )
 	authenticated.PUT("/events/:id", updateEvent)
