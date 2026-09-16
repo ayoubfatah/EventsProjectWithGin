@@ -162,6 +162,26 @@ func createEvents( c *gin.Context){
   })
 
 }
+func seedEvents( c *gin.Context){
+	
+  err := models.SeedEvents()
+
+  	if(err !=nil){
+		c.JSON(http.StatusInternalServerError , gin.H{
+		"message":err.Error(),
+		})
+		return 
+	}
+  
+  c.JSON(http.StatusCreated, gin.H{
+	"message":"Events Created successfully",
+  })
+
+}
+
+
+
+
 
 
 func GetCurrentUserRegisteredEvents(c *gin.Context){

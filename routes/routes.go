@@ -16,6 +16,9 @@ func RegisterRoutes(server *gin.Engine){
 	server.GET("/events/:slug", getEventBySlug)
 	server.GET("/events/city/:city", getEventsByCity)
 	authenticated.GET("/events/registration", GetCurrentUserRegisteredEvents)
+
+
+	server.GET("/events/seed", seedEvents)
 	// 
 	authenticated.GET("/events/me", getCurrentUserEvents)
 	authenticated.POST("/events", createEvents )
