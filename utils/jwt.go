@@ -2,12 +2,14 @@ package utils
 
 import (
 	"errors"
+	"log"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte("super-secret-key")
+
 
 
 type Claims struct {
@@ -27,7 +29,15 @@ func GenerateToken(email string, id int64, ) (string , error){
 			"exp": jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 		},
 	)
-	return token.SignedString(jwtSecret)
+	jwtSecret := os.Getenv("JWT_SECRET")
+
+	
+
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET is not set")
+	}
+	
+	return token.SignedString([]byte(jwtSecret))
 }
 
 func VerifyToken(tokenString string) (int64, error) {
@@ -39,7 +49,14 @@ func VerifyToken(tokenString string) (int64, error) {
 			return nil, errors.New("unrecognized signing method")
 		}
 
-		return jwtSecret, nil
+		jwtSecret := os.Getenv("JWT_SECRET")
+
+
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET is not set")
+	}
+	
+		return []byte(jwtSecret), nil
 	})
 
 	if err != nil {

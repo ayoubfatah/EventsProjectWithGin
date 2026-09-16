@@ -16,9 +16,7 @@ func getEvents(c *gin.Context) {
 	page := 1
 	limit := 4
 
-	// -----------------------------
-	// Get page
-	// -----------------------------
+
 
 	if pageQuery := c.Query("page"); pageQuery != "" {
 
@@ -34,9 +32,7 @@ func getEvents(c *gin.Context) {
 		page = parsedPage
 	}
 
-	// -----------------------------
-	// Get limit
-	// -----------------------------
+
 
 	if limitQuery := c.Query("limit"); limitQuery != "" {
 
@@ -57,9 +53,6 @@ func getEvents(c *gin.Context) {
 		limit = 50
 	}
 
-	// -----------------------------
-	// Fetch events
-	// -----------------------------
 
 	result, err := models.GetAllEvents(page, limit)
 
@@ -70,9 +63,7 @@ func getEvents(c *gin.Context) {
 		return
 	}
 
-	// -----------------------------
-	// Response
-	// -----------------------------
+
 
 	c.JSON(http.StatusOK, result)
 }

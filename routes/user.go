@@ -43,7 +43,7 @@ func getAllUsers(c *gin.Context){
 		return
 	}
 	  c.JSON(http.StatusOK, gin.H{ 
-      "events": users,
+      "users": users,
     }) 
 }
 
