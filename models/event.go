@@ -477,8 +477,7 @@ func GetRegisteredEventsByUser(userId int64) ([]Event, error) {
 		FROM events e
 		INNER JOIN registrations r ON e.id = r.eventId
 		WHERE r.userId = ?
-			  ORDER BY id DESC
-		
+		ORDER BY id DESC
 	`
 
 	rows, err := db.DB.Query(query, userId)

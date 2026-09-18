@@ -190,7 +190,7 @@ func seedEvents(c *gin.Context) {
 
 
 func GetCurrentUserRegisteredEvents(c *gin.Context){
-	userId := int64(1)
+  	userId := c.GetInt64("userId")
 	registeredEvents , err :=  models.GetRegisteredEventsByUser(userId)
 	
 	if err != nil {
